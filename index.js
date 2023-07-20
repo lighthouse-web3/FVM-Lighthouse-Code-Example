@@ -28,15 +28,15 @@ const readEvents = require("./readEvents");
 
 app.get('/', async (req, res) => {
   try {
-    // // Assuming StoreData() returns a promise
+    // Assuming StoreData() returns a promise
     await StoreData();
     
     console.log("waiting for 30 seconds");
     
-    // // Wait for 30 seconds using await
+    // Wait for 30 seconds using await
     await new Promise((resolve) => setTimeout(resolve, 30000));
     
-    // // Now, call the readEvents function
+    // Now, call the readEvents function
     readEvents();
     
     res.send('Hello, World!');
