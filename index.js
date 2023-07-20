@@ -1,14 +1,14 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const StoreData = require("./scripts/StoreData");
-const readEvents = require("./scripts/readEvents");
-const getFileIdDetails = require("./scripts/getFileIdDetails");
+const storeData = require("./scripts1/storeData");
+const readEvents = require("./scripts1/readEvents");
+const getFileIdDetails = require("./scripts1/getFileIdDetails");
 
 app.get('/', async (req, res) => {
   try {
     // Assuming StoreData() returns a promise
-    // await StoreData();
+    // await storeData();
     
     // console.log("waiting for 30 seconds");
     
