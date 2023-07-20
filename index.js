@@ -1,43 +1,25 @@
-// const express = require('express');
-// // import express from "express";
-// const app = express();
-// const port = 3000;
-// const StoreData = require("./StoreData");
-// const readEvents = require("./readEvents");
-
-// app.get('/', (req, res) => {
-//     StoreData()
-//     console.log("waiting for 30 seconds");
-//     setTimeout(readEvents, 30000);
-
-//     // readEvents()
-    
-//     res.send('Hello, World!');
-//     // StoreData;
-// });
-
-// app.listen(port, () => {
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
-
 const express = require('express');
 const app = express();
 const port = 3000;
-const StoreData = require("./StoreData");
-const readEvents = require("./readEvents");
+const StoreData = require("./Scripts/StoreData");
+const readEvents = require("./Scripts/readEvents");
+const getFileIdDetails = require("./Scripts/getFileIdDetails");
 
 app.get('/', async (req, res) => {
   try {
     // Assuming StoreData() returns a promise
-    await StoreData();
+    // await StoreData();
     
-    console.log("waiting for 30 seconds");
+    // console.log("waiting for 30 seconds");
     
     // Wait for 30 seconds using await
     await new Promise((resolve) => setTimeout(resolve, 30000));
     
     // Now, call the readEvents function
-    readEvents();
+    //   readEvents();
+      
+      // Get Deal details
+      getFileIdDetails();
     
     res.send('Hello, World!');
   } catch (error) {
