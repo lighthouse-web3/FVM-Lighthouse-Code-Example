@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const storeData = require("./scripts/storeData1");
+const storeData = require("./scripts/storeData");
 const readEvents = require("./scripts/readEvents");
 const getFileIdDetails = require("./scripts/getFileIdDetails");
 
