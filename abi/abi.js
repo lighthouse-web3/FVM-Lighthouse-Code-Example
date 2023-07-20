@@ -160,7 +160,7 @@ module.exports = [
         type: "bytes",
       },
     ],
-    name: "StoreData",
+    name: "storeData",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

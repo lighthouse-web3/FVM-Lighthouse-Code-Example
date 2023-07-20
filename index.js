@@ -7,7 +7,7 @@ const getFileIdDetails = require("./scripts/getFileIdDetails");
 
 app.get('/', async (req, res) => {
   try {
-    // Assuming StoreData() returns a promise
+    // Assuming storeData() returns a promise
     // await storeData();
     
     // console.log("waiting for 30 seconds");

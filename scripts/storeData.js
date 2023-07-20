@@ -3,7 +3,7 @@ const { ethers } = require("ethers");
 const aggregatorAbi = require("../abi/abi");
 
 
-const StoreData = async () => {
+const storeData = async () => {
   const provider = new ethers.providers.JsonRpcProvider("https://api.calibration.node.glif.io/rpc/v1");
   const privateKey = process.env.PRIVATE_KEY; //wallet private key
   const signer = new ethers.Wallet(privateKey, provider);
@@ -17,12 +17,12 @@ const StoreData = async () => {
   const fileLinkBytes = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(fileLink));
   
 
-  let StoreData = await contract.StoreData(fileLinkBytes, {
+  let storeData = await contract.storeData(fileLinkBytes, {
     gasLimit: 50_000_000,
   });
 
-  console.log(StoreData);
+  console.log(storeData);
   console.log("transaction done");
 };
 
-module.exports = StoreData;
+module.exports = storeData;
