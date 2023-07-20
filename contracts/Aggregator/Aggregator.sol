@@ -25,15 +25,15 @@ contract Aggregator is IAggregatorOracle, Proof {
 
     /**
      * @notice mapping to track all the file id storage info
-     * @dev fileId -> dealDetails struct
+     * @dev fileId -> fileDetails struct
      */
-    mapping(uint => dealDetails) public idToUser;
+    mapping(uint => fileDetails) public fileIdToDetails;
 
     /**
      * @notice mapping to store file ID against deal Id
      * @dev file ID -> deal ID
      */
-    mapping(uint => uint) public fileToDealId;
+    mapping(uint => dealDetails) public fileIdToDealDetails;
 
     /**
      * @notice event storing the details of the file
@@ -54,24 +54,30 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @notice event to emit when file is stored
      * @param fileId file id
      */
-    event DealCreated(uint fileId, uint dealId);
+    event DealCreated(uint fileId, uint dealId, bytes cid);
 
-    /// @notice Struct to store all the details about file storage
-    struct dealDetails {
+    /// @notice Struct to store all the details about proposed file
+    struct fileDetails {
         address user; // address of the user
         bytes fileLink; // link of the file
+    }
+
+    /// @notice Struct to store all the details about stored file
+    struct dealDetails {
+        uint dealId;
+        bytes cid;
     }
 
     /**
      * @notice function to store file
      * @param _fileLink file link of the file
      */
-    function StoreData(bytes calldata _fileLink) external {
+    function storeData(bytes calldata _fileLink) external {
         unchecked {
             ++fileId;
         }
-        idToUser[fileId].user = msg.sender;
-        idToUser[fileId].fileLink = _fileLink;
+        fileIdToDetails[fileId].user = msg.sender;
+        fileIdToDetails[fileId].fileLink = _fileLink;
 
         emit DataInfo(_fileLink, fileId, msg.sender);
     }
@@ -95,7 +101,7 @@ contract Aggregator is IAggregatorOracle, Proof {
         emit CompleteAggregatorRequest(_fileId, _dealId);
 
         // save the _dealId if it is not already saved
-        bytes memory fileLink = idToUser[_fileId].fileLink;
+        bytes memory fileLink = fileIdToDetails[_fileId].fileLink;
         for (uint i = 0; i < fileToDealIds[fileLink].length; i++) {
             if (fileToDealIds[fileLink][i] == _dealId) {
                 return this.computeExpectedAuxData(_proof, _verifierData);
@@ -113,31 +119,39 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @param _fileId unique id of file
      * @param _dealId deal id
      * @param _isMigrated file stored
+     * @param _cid of the file
      * @dev called by the lighthouse aggregator backend
      */
     function setDealDetails(
         uint _fileId,
         uint _dealId,
-        bool _isMigrated
+        bool _isMigrated,
+        bytes memory _cid
     ) external {
         if (!_isMigrated) {
             failedMigration[_fileId] = true;
             emit DealNotCreated(_fileId);
             return;
         }
-        fileToDealId[_fileId] = _dealId;
-        emit DealCreated(_fileId, _dealId);
+        fileIdToDealDetails[_fileId].dealId = _dealId;
+        fileIdToDealDetails[_fileId].cid = _cid;
+        emit DealCreated(_fileId, _dealId, _cid);
     }
 
     // ////////   GETTER FUNCTION ///////////////////
 
     /**
-     * @notice function to get the Deal id from file id
+     * @notice function to get the Deal id and CID from file id
      * @param _fileId unique id of file
      * @dev called by the user
      */
-    function getDealId(uint _fileId) external view returns (uint) {
-        return fileToDealId[_fileId];
+    function getDealDetails(
+        uint _fileId
+    ) external view returns (bytes memory, uint) {
+        return (
+            fileIdToDealDetails[_fileId].cid,
+            fileIdToDealDetails[_fileId].dealId
+        );
     }
 
     /**
@@ -209,13 +223,14 @@ contract Aggregator is IAggregatorOracle, Proof {
      */
     function getFileDetails(
         uint _fileId
-    ) external view returns (address, bytes memory, uint, bool) {
+    ) external view returns (address, bytes memory, uint, bool, bytes memory) {
         bool fileMigrated = checkMigration(_fileId);
         return (
-            idToUser[_fileId].user,
-            idToUser[_fileId].fileLink,
-            fileToDealId[_fileId],
-            fileMigrated
+            fileIdToDetails[_fileId].user,
+            fileIdToDetails[_fileId].fileLink,
+            fileIdToDealDetails[_fileId].dealId,
+            fileMigrated,
+            fileIdToDealDetails[_fileId].cid
         );
     }
 }
