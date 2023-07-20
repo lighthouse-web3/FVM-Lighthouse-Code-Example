@@ -1,26 +1,24 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
-const aggregatorAbi = require("../abi/abi");
+const aggregatorAbi = require("../abi/aggregatorABI");
 
-
-const callFileDetails = async () => {
+const callFileDetails = async (fileId) => {
   const provider = new ethers.providers.JsonRpcProvider("https://api.calibration.node.glif.io/rpc/v1");
   const privateKey = process.env.PRIVATE_KEY; //wallet private key
   const signer = new ethers.Wallet(privateKey, provider);
 
-  const contractAddress = "0xAD978E56d3264673bA8705c1e7b2f00932345B1D";
+  const contractAddress = "0x467b08Ae34df6Bd00947555A308cFB935D8Ab06c";
 
   const contract = new ethers.Contract(contractAddress, aggregatorAbi, signer);
 
-    const fileId = 6;
-
-  let callFileDetails = await contract.getFileDetails(fileId, {
+  let fileInfo = await contract.getDealDetails(fileId, {
     gasLimit: 50_000_000,
   });
 
-  console.log(callFileDetails);
-  console.log("transaction done");
+  // let GetDetails = await contract.idToUser(fileId);
+  const bytes = ethers.utils.arrayify(fileInfo[0]);
+  console.log("CID: ", ethers.utils.toUtf8String(bytes));
+  console.log("DealID: ", Number(fileInfo[1]));  // Deal ID 0 imply deal is not created
 };
 
-
-module.exports = callFileDetails;
+callFileDetails(1)
