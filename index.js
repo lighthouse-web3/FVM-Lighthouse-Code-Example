@@ -1,9 +1,9 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const storeData = require("./scripts1/storeData");
-const readEvents = require("./scripts1/readEvents");
-const getFileIdDetails = require("./scripts1/getFileIdDetails");
+const storeData = require("./scripts/storeData1");
+const readEvents = require("./scripts/readEvents");
+const getFileIdDetails = require("./scripts/getFileIdDetails");
 
 app.get('/', async (req, res) => {
   try {

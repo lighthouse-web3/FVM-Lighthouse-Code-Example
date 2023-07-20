@@ -1,9 +1,9 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
-const aggregatorAbi = require("../abi/abi");
+const aggregatorAbi = require("../abi111/abi");
 
 
-const StoreData = async () => {
+const callFileDetails = async () => {
   const provider = new ethers.providers.JsonRpcProvider("https://api.calibration.node.glif.io/rpc/v1");
   const privateKey = process.env.PRIVATE_KEY; //wallet private key
   const signer = new ethers.Wallet(privateKey, provider);
@@ -12,17 +12,15 @@ const StoreData = async () => {
 
   const contract = new ethers.Contract(contractAddress, aggregatorAbi, signer);
 
-  // Transcation detail
-  const fileLink = "https://gateway.lighthouse.storage/ipfs/bafkreia4ruswe7ghckleh3lmpujo5asrnd7hrtu5r23zjk2robpcoend34";
-  const fileLinkBytes = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(fileLink));
-  
+    const fileId = 6;
 
-  let StoreData = await contract.StoreData(fileLinkBytes, {
+  let callFileDetails = await contract.getFileDetails(fileId, {
     gasLimit: 50_000_000,
   });
 
-  console.log(StoreData);
+  console.log(callFileDetails);
   console.log("transaction done");
 };
 
-module.exports = StoreData;
+
+module.exports = callFileDetails;
