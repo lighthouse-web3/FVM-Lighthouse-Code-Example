@@ -1,6 +1,4 @@
 // const express = require('express');
-// // const aggregatorAbi = require("./ABI");
-// // import StoreData from "./StoreData";
 // // import express from "express";
 // const app = express();
 // const port = 3000;
@@ -9,7 +7,6 @@
 
 // app.get('/', (req, res) => {
 //     StoreData()
-//     // storeData() ()
 //     console.log("waiting for 30 seconds");
 //     setTimeout(readEvents, 30000);
 
@@ -32,12 +29,12 @@ const readEvents = require("./readEvents");
 app.get('/', async (req, res) => {
   try {
     // // Assuming StoreData() returns a promise
-    // await StoreData();
+    await StoreData();
     
-    // console.log("waiting for 30 seconds");
+    console.log("waiting for 30 seconds");
     
     // // Wait for 30 seconds using await
-    // await new Promise((resolve) => setTimeout(resolve, 30000));
+    await new Promise((resolve) => setTimeout(resolve, 30000));
     
     // // Now, call the readEvents function
     readEvents();
