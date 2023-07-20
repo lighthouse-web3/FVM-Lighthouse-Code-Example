@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
-const aggregatorAbi = require("../ABI/abi");
+const aggregatorAbi = require("../abi/abi");
 
 
 const callFileDetails = async () => {

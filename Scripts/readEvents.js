@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const aggregatorAbi = require("../ABI/abi");
+const aggregatorAbi = require("../abi/abi");
 require("dotenv").config();
 
 // Replace the following with your Ethereum node URL and contract address
