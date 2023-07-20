@@ -11,12 +11,8 @@ const storeData = async () => {
 
   const contract = new ethers.Contract(contractAddress, aggregatorAbi, signer);
 
-  // -------------------------------------------------------------------
-  // Follow this Documentation (https://docs.lighthouse.storage/lighthouse-1/lighthouse-sdk/code-examples/nodejs-backend/nodejs) to generate the GateWay URI. 
-  
-  // Using the Lighthouse SDK, you can set the path to any local file and get the Gateway URI. 
-  // ---------------------------------------------------------------------
-  
+  // Follow this documentation (https://docs.lighthouse.storage/lighthouse-1/lighthouse-sdk/code-examples/nodejs-backend/nodejs) to upload file via Lighthouse SDK
+
   // Transaction details
   const fileLink = "https://gateway.lighthouse.storage/ipfs/bafkreia4ruswe7ghckleh3lmpujo5asrnd7hrtu5r23zjk2robpcoend34";
   const fileLinkBytes = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(fileLink));
