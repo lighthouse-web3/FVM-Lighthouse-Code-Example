@@ -14,12 +14,12 @@ interface IAggregatorOracle {
     // Complete Aggregator Request Event
     event CompleteAggregatorRequest(uint256 indexed _id, uint64 indexed _dealId);
 
-    // /**
-    //  * @dev submit submits a new request to the oracle
-    //  * @param _cid is the cid of the data segment
-    //  * @return id the transaction ID
-    //  */
-    // function submit(bytes memory _cid) external returns (uint256 id);
+    /**
+     * @dev submit submits a new request to the oracle
+     * @param _fileLink is the cid of the data segment
+     * @return id the transaction ID
+     */
+    function submit(bytes memory _fileLink) external returns (uint256 id);
 
     /**
      * @dev complete is a callback function that is called by the aggregator
@@ -29,7 +29,7 @@ interface IAggregatorOracle {
      * @param _verifierData is the verifier data
      * @return the aux data
      */
-    function verifyPodsi(
+    function complete(
         uint256 _id,
         uint64 _dealId,
         InclusionProof memory _proof,
