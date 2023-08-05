@@ -72,7 +72,7 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @notice function to store file
      * @param _fileLink file link of the file
      */
-    function storeData(bytes calldata _fileLink) external {
+    function submit(bytes calldata _fileLink) external returns (uint256 id) {
         unchecked {
             ++fileId;
         }
@@ -80,23 +80,24 @@ contract Aggregator is IAggregatorOracle, Proof {
         fileIdToDetails[fileId].fileLink = _fileLink;
 
         emit DataInfo(_fileLink, fileId, msg.sender);
+        return fileId;
     }
 
     /**
-     * @dev verifyPodsi is a callback function that is called by the aggregator
+     * @dev complete is a callback function that is called by the aggregator
      * @param _fileId is the transaction ID
      * @param _dealId is the deal ID
      * @param _proof is the inclusion proof
      * @param _verifierData is the verifier data
      * @return the aux data
      */
-    function verifyPodsi(
+    function complete(
         uint256 _fileId,
         uint64 _dealId,
         InclusionProof memory _proof,
         InclusionVerifierData memory _verifierData
     ) external returns (InclusionAuxData memory) {
-        require(_fileId <= fileId, "verifyPodsi: invalid transaction id");
+        require(_fileId <= fileId, "complete: invalid transaction id");
         // Emit the event
         emit CompleteAggregatorRequest(_fileId, _dealId);
 
@@ -138,7 +139,7 @@ contract Aggregator is IAggregatorOracle, Proof {
         emit DealCreated(_fileId, _dealId, _cid);
     }
 
-    // ////////   GETTER FUNCTION ///////////////////
+    //////////           GETTER FUNCTIONS          ///////////////
 
     /**
      * @notice function to get the Deal id and CID from file id
@@ -170,6 +171,7 @@ contract Aggregator is IAggregatorOracle, Proof {
     /**
      * @notice function to check that this deal is expired or not
      * @param _dealId Deal Id
+     * @dev if MarketAPI.getDealActivation(_dealId) > 0 then deal is terminated and if the value is zero then deal is still stored in the network
      */
     function checkDealExpire(uint64 _dealId) external view returns (bool) {
         MarketTypes.GetDealActivationReturn memory ret = MarketAPI
