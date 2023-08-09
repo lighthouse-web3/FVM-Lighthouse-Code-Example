@@ -16,10 +16,16 @@ interface IAggregatorOracle {
 
     /**
      * @dev submit submits a new request to the oracle
-     * @param _fileLink is the cid of the data segment
+     * @param data_url is the cid of the data segment
      * @return id the transaction ID
      */
-    function submit(bytes memory _fileLink) external returns (uint256 id);
+    function submit(
+        bytes memory data_url,
+        bytes memory miner,
+        uint num_copies,
+        uint repair_threshold,
+        uint renew_threshold
+    ) external returns (uint256 id);
 
     /**
      * @dev complete is a callback function that is called by the aggregator

@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.17;
 
-import {IAggregatorOracle} from "../AggregatorOracle/IAggregatorOracle.sol";
-import {Proof} from "../DataSegment/Proof.sol";
-import {InclusionProof, InclusionVerifierData, InclusionAuxData} from "../DataSegment/ProofTypes.sol";
-import {MarketAPI} from "@zondax/filecoin-solidity/contracts/v0.8/MarketAPI.sol";
-import {MarketTypes} from "@zondax/filecoin-solidity/contracts/v0.8/types/MarketTypes.sol";
-import {CommonTypes} from "@zondax/filecoin-solidity/contracts/v0.8/types/CommonTypes.sol";
+import { IAggregatorOracle } from "../AggregatorOracle/IAggregatorOracle.sol";
+import { Proof } from "../DataSegment/Proof.sol";
+import { InclusionProof, InclusionVerifierData, InclusionAuxData } from "../DataSegment/ProofTypes.sol";
+import { MarketAPI } from "@zondax/filecoin-solidity/contracts/v0.8/MarketAPI.sol";
+import { MarketTypes } from "@zondax/filecoin-solidity/contracts/v0.8/types/MarketTypes.sol";
+import { CommonTypes } from "@zondax/filecoin-solidity/contracts/v0.8/types/CommonTypes.sol";
 
 error INCORRECT_FILE_ID();
 
@@ -42,7 +42,15 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @param fileId file id
      * @dev event listen by the backend services
      */
-    event DataInfo(bytes fileLink, uint indexed fileId, address user);
+    event DataInfo(
+        bytes fileLink,
+        uint indexed fileId,
+        address user,
+        bytes miner,
+        uint num_copies,
+        uint repair_threshold,
+        uint renew_threshold
+    );
 
     /**
      * @notice event to emit when file is not stored
@@ -70,16 +78,22 @@ contract Aggregator is IAggregatorOracle, Proof {
 
     /**
      * @notice function to store file
-     * @param _fileLink file link of the file
+     * @param data_url file link of the file
      */
-    function submit(bytes calldata _fileLink) external returns (uint256 id) {
+    function submit(
+        bytes memory data_url,
+        bytes memory miner,
+        uint num_copies,
+        uint repair_threshold,
+        uint renew_threshold
+    ) external returns (uint256 id) {
         unchecked {
             ++fileId;
         }
         fileIdToDetails[fileId].user = msg.sender;
-        fileIdToDetails[fileId].fileLink = _fileLink;
+        fileIdToDetails[fileId].fileLink = data_url;
 
-        emit DataInfo(_fileLink, fileId, msg.sender);
+        emit DataInfo(data_url, fileId, msg.sender, miner, num_copies, repair_threshold, renew_threshold);
         return fileId;
     }
 
@@ -123,12 +137,7 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @param _cid of the file
      * @dev called by the lighthouse aggregator backend
      */
-    function setDealDetails(
-        uint _fileId,
-        uint _dealId,
-        bool _isMigrated,
-        bytes memory _cid
-    ) external {
+    function setDealDetails(uint _fileId, uint _dealId, bool _isMigrated, bytes memory _cid) external {
         if (!_isMigrated) {
             failedMigration[_fileId] = true;
             emit DealNotCreated(_fileId);
@@ -146,13 +155,8 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @param _fileId unique id of file
      * @dev called by the user
      */
-    function getDealDetails(
-        uint _fileId
-    ) external view returns (bytes memory, uint) {
-        return (
-            fileIdToDealDetails[_fileId].cid,
-            fileIdToDealDetails[_fileId].dealId
-        );
+    function getDealDetails(uint _fileId) external view returns (bytes memory, uint) {
+        return (fileIdToDealDetails[_fileId].cid, fileIdToDealDetails[_fileId].dealId);
     }
 
     /**
@@ -174,8 +178,7 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @dev if MarketAPI.getDealActivation(_dealId) > 0 then deal is terminated and if the value is zero then deal is still stored in the network
      */
     function checkDealExpire(uint64 _dealId) external view returns (bool) {
-        MarketTypes.GetDealActivationReturn memory ret = MarketAPI
-            .getDealActivation(_dealId);
+        MarketTypes.GetDealActivationReturn memory ret = MarketAPI.getDealActivation(_dealId);
         if (CommonTypes.ChainEpoch.unwrap(ret.terminated) > 0) {
             return true;
         } else if (CommonTypes.ChainEpoch.unwrap(ret.activated) > 0) {
@@ -188,9 +191,7 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @param _dealId Deal Id
      */
     function getTimeToDealExpire(uint64 _dealId) external view returns (int) {
-        MarketTypes.GetDealTermReturn memory ret = MarketAPI.getDealTerm(
-            _dealId
-        );
+        MarketTypes.GetDealTermReturn memory ret = MarketAPI.getDealTerm(_dealId);
         int64 end = CommonTypes.ChainEpoch.unwrap(ret.end);
         uint64 currentBlock = uint64(block.number);
         int64 currentBlockInt = int64(currentBlock);
@@ -199,13 +200,11 @@ contract Aggregator is IAggregatorOracle, Proof {
 
     /**
      * @notice getDeals returns all deals for a file
-     * @param _fileLink Link of the file
+     * @param data_url Link of the file
      * @return the deal IDs
      */
-    function getDeals(
-        bytes memory _fileLink
-    ) external view returns (uint64[] memory) {
-        return fileToDealIds[_fileLink];
+    function getDeals(bytes memory data_url) external view returns (uint64[] memory) {
+        return fileToDealIds[data_url];
     }
 
     /**
@@ -223,9 +222,7 @@ contract Aggregator is IAggregatorOracle, Proof {
      * @return deal Id of the file
      * @return check file is migrated
      */
-    function getFileDetails(
-        uint _fileId
-    ) external view returns (address, bytes memory, uint, bool, bytes memory) {
+    function getFileDetails(uint _fileId) external view returns (address, bytes memory, uint, bool, bytes memory) {
         bool fileMigrated = checkMigration(_fileId);
         return (
             fileIdToDetails[_fileId].user,
