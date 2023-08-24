@@ -7,7 +7,7 @@ const callFileDetails = async (fileId) => {
   const privateKey = process.env.PRIVATE_KEY; //wallet private key
   const signer = new ethers.Wallet(privateKey, provider);
 
-  const contractAddress = "0x467b08Ae34df6Bd00947555A308cFB935D8Ab06c";
+  const contractAddress = "0x27235FbFee0F5519A8786EA7Fc13258234aC1847";
 
   const contract = new ethers.Contract(contractAddress, aggregatorAbi, signer);
 
@@ -21,4 +21,4 @@ const callFileDetails = async (fileId) => {
   console.log("DealID: ", Number(fileInfo[1]));  // Deal ID 0 imply deal is not created
 };
 
-callFileDetails(1)
+callFileDetails(9)

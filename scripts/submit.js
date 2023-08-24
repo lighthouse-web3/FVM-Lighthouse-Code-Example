@@ -4,19 +4,20 @@ const aggregatorAbi = require("../abi/aggregatorABI");
 
 const submit = async () => {
   const provider = new ethers.providers.JsonRpcProvider("https://api.calibration.node.glif.io/rpc/v1");
-  const privateKey = "0x6aa0ee41fa9cf65f90c06e5db8fa2834399b59b37974b21f2e405955630d472a"//process.env.PRIVATE_KEY; //wallet private key
+  const privateKey = process.env.PRIVATE_KEY; //wallet private key
   const signer = new ethers.Wallet(privateKey, provider);
 
-  const contractAddress = "0x36F6eBc3dDe9e0321e9c62DB64857DD23C63dFD4";
+  const contractAddress = "0x27235FbFee0F5519A8786EA7Fc13258234aC1847"
 
   const contract = new ethers.Contract(contractAddress, aggregatorAbi, signer);
 
   // Follow this documentation (https://docs.lighthouse.storage/lighthouse-1/lighthouse-sdk/code-examples/nodejs-backend/nodejs) to upload file via Lighthouse SDK
   // Transaction details
-  const data_url = "https://gateway.lighthouse.storage/ipfs/bafkreia4ruswe7ghckleh3lmpujo5asrnd7hrtu5r23zjk2robpcoend34";
+  const data_url = "https://gateway.lighthouse.storage/ipfs/QmQvQwY42QuukKKWB52qtxMQHVNFM6kjz4Pq3sQwN5f7xY";
   const fileLinkBytes = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(data_url));
   
-  const submit = await contract.submit(fileLinkBytes, ethers.utils.hexlify(ethers.utils.toUtf8Bytes("")), 0, 0, 0, {
+  // order- file_url, miner, num_copies, repair_threshold, renew_threshold
+  const submit = await contract.submit(fileLinkBytes, ethers.utils.hexlify(ethers.utils.toUtf8Bytes("t017387")), 2, 0, 240, {
     gasLimit: 50_000_000,
   });
 
